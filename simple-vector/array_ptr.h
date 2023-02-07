@@ -29,8 +29,9 @@ public:
     ArrayPtr& operator=(const ArrayPtr&) = delete;
 
     ArrayPtr& operator=(ArrayPtr&& other) {
-        assert(this->raw_ptr_ != other.raw_ptr_);
-        raw_ptr_ = std::move(other.raw_ptr_);
+        if (raw_ptr_ != other.raw_ptr_) {
+            raw_ptr_ = std::move(other.raw_ptr_);
+        }
         return *this;
     }
 
