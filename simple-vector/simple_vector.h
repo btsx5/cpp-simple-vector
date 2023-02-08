@@ -94,7 +94,7 @@ public:
     }
 
     Iterator Insert(ConstIterator pos, const Type& value) {
-        assert(pos != nullptr);
+        assert(begin() <= pos && pos <= end());
         if (size_ < capacity_) {
             std::copy_backward(const_cast<Iterator>(pos),end(), end() + 1);
             items_[pos-begin()] = value;
@@ -108,13 +108,13 @@ public:
             std::copy_backward(const_cast<Iterator>(pos),end(), tmp.end() + 1);
             tmp.items_[shift] = value;
             swap(tmp);
-            size_ = ++tmp.size_;
+            ++size_;
             return begin() + shift;
         }
     }
 
     Iterator Insert(ConstIterator pos, Type&& value) {
-        assert(pos != nullptr);
+        assert(begin() <= pos && pos <= end());
         if (size_ < capacity_) {
             std::copy_backward(std::make_move_iterator(const_cast<Iterator>(pos)),std::make_move_iterator(end()), end() + 1);
             items_[pos - begin()] = std::move(value);
@@ -159,16 +159,16 @@ public:
     }
 
     Type& operator[](size_t index) noexcept {
+        assert(index < size_);
         return items_[index];
     }
 
     const Type& operator[](size_t index) const noexcept {
-        assert(size_ <= index);
+        assert(index < size_);
         return items_[index];
     }
 
     Type& At(size_t index) {
-        assert(size_ <= index);
         return index >= size_ ? throw std::out_of_range("out of range") : items_[index];
     }
 
@@ -217,19 +217,19 @@ public:
     }
 
     ConstIterator begin() const noexcept {
-        return (IsEmpty()) ? nullptr : &items_[0];
+        return items_.Get();
     }
 
     ConstIterator end() const noexcept {
-        return (IsEmpty()) ? nullptr : &items_[size_];
+        return items_.Get() + size_;
     }
 
     ConstIterator cbegin() const noexcept {
-        return (IsEmpty()) ? nullptr : &items_[0];
+        return items_.Get();
     }
 
     ConstIterator cend() const noexcept {
-        return (IsEmpty()) ? nullptr : &items_[size_];
+        return items_.Get() + size_;
     }
 
     void swap(SimpleVector& other) noexcept {
